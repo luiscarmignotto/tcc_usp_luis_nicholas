@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from decimal import Decimal
 import scipy.optimize
+import nlopt
 
 #### PARAMETROS AJUSTAVEIS ###############
 f = 15;                               # frequência do sinal de estímulo elétrico de entrada
@@ -128,6 +129,7 @@ def ineq_constraint_b2_upper(x):
     b2 = x[3]
     return b2 -1 
 
+#########################################################################
 constraint_a1_1 = {'type': 'ineq', 'fun': ineq_constraint_a1_lower}
 constraint_a1_2 = {'type': 'ineq', 'fun': ineq_constraint_a1_upper}
 constraint_a2_1 = {'type': 'ineq', 'fun': ineq_constraint_a2_lower}
@@ -146,14 +148,16 @@ constraints_optm = [constraint_a1_1, \
                constraint_b2_1, \
                constraint_b2_2]
     
+erro_base = Erro([0,0,0,0])
 
-xopt = scipy.optimize.minimize(Erro,x0=[0,0,0,0], method='SLSQP',constraints=constraints_optm)
+xopt = scipy.optimize.minimize(Erro,x0=[0,0,0,0], method='trust-constr',constraints=constraints_optm)
 
 
 a1_opt = xopt.x[0]
 a2_opt = xopt.x[1]
 b1_opt = xopt.x[2]
 b2_opt = xopt.x[3]
+
 y_opt = Wiener_Hammerstein(u,a1_opt,a2_opt,b1_opt,b2_opt,d,f,totalTimeArray,samplingRate,tempoTreino, ratioOnOff)
 
 
@@ -166,5 +170,13 @@ plt.figure()
 plt.plot(totalTimeArray, y_opt)
 plt.show()
 
+#############################################################
+x0 = [0,0,0,0]
 
-
+opt = nlopt.opt(nlopt.LD_SLSQP,len(x0))
+opt.set_min_objective(Erro)
+opt.add_inequality_constraint(constraints)
+opt.set_ftol_abs(1e-15)
+xopt = opt.optimize(x0.copy())
+fval = opt.last_optimum_value()
+print_res(xopt,fval,"SLSQP w/ jacobian");
