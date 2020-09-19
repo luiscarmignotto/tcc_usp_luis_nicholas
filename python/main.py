@@ -11,7 +11,7 @@ periodo = 1/frequencia
 taxa_de_amostragem = 0.001
 ratio_on_off = 1/3                     
 tempo_treino = 2                       
-n_treinos = 1             
+n_treinos = 1       
 tempo_total = n_treinos*tempo_treino    
 vetor_tempo = np.arange(0,tempo_total,taxa_de_amostragem)
 delay = 0
@@ -21,7 +21,7 @@ x0_referencia = np.array([0.9423679,0.9762052,0.9712435,0.0093602], dtype='doubl
 
 ### PARAMETROS OTIMIZAÇÃO ###################################
 x0 = [0,0,0,0]
-n_iteracoes = 100
+n_iteracoes = 50
 algoritmo_otimizacao = 'trust-constr'
 bounds=Bounds([0.0, 0.0, 0.0, 0.0], [1.0,1.0,1.0,1.0])
 
